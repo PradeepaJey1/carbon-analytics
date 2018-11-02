@@ -1005,36 +1005,38 @@
     </div>
 </div>
 
-<script id="attribute-form-template" type="text/x-handlebars-template">
-    <h3>Attributes</h3>
+<script id = "attribute-form-template" type = "text/x-handlebars-template">
+    <h4>Attributes</h4>
     <ul>
-        <div id="attribute-div">
+        <div id = "attribute-div">
             {{#each this}}
-            <li class="attribute">
-                <div class="attr-content">
-                    <input type="text" value="{{name}}" class="attr-name"/> &nbsp;
-                    <select class="attr-type">
-                        <option value="string">string</option>
-                        <option value="int">int</option>
-                        <option value="long">long</option>
-                        <option value="float">float</option>
-                        <option value="double">double</option>
-                        <option value="bool">bool</option>
-                        <option value="object">object</option>
-                    </select>
+            <li class = "attribute clearfix">
+                <div class = "clearfix">
+                    <div class = "attr-content">
+                        <input type = "text" value = "{{name}}" class = "attr-name"/>
+                        <select class = "attr-type">
+                            <option value = "string"> string </option>
+                            <option value = "int"> int </option>
+                            <option value = "long"> long </option>
+                            <option value = "float"> float </option>
+                            <option value = "double"> double </option>
+                            <option value = "bool"> bool </option>
+                            <option value = "object"> object </option>
+                        </select>
+                    </div>
+                    <div class = "attr-nav"></div>
                 </div>
-                <div class="attr-nav"></div>
+                <label class = "error-message"></label>
             </li>
             {{/each}}
         </div>
     </ul>
-    <br>
-    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
 </script>
 
-<script id="annotation-form-template" type="text/x-handlebars-template">
-    <h3>Annotations</h3>
-    <div id="annotation-div">
+<script id = "annotation-form-template" type = "text/x-handlebars-template">
+    <h4>Annotations</h4>
+    <div id = "annotation-div">
         {{#if this}}
         <ul>
             {{#each this}}
@@ -1044,31 +1046,31 @@
         {{/if}}
     </div>
     <br>
-    <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
-    <button id="btn-add-key-val" class="btn btn-default" style="display: none"> + Property</button>
-    <button id="btn-del-annotation" class="btn btn-default" style="display: none"> Delete</button>
-    <br>
+    <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
+    <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
+    <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
 </script>
 
-<script id="recursiveAnnotationPartial" type="text/template">
+<script id = "recursiveAnnotationPartial" type = "text/template">
     {{#if predefined}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
+                            {{value}}
                         </li>
                     </ul>
                 </li>
                 {{/each}}
     {{else}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
                             {{value}}
                         </li>
                     </ul>
