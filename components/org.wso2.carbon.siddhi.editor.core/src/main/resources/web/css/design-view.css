@@ -599,108 +599,265 @@ a.list-group-item, button.list-group-item {
     display: none;
 }
 
-#
+.not-connected-source-sink {
+	border: 1px solid yellow;
+	box-shadow: 0 0 1px 2px yellow;
+}
 
 .error-element {
     border: 1px solid #FF0000;
     box-shadow: 0 0 1px 2px #FF0000;
 }
 
+.js-tree-error-node {
+	border: 1px solid red;
+	background: red;
+}
+
+.source-sink-form-container input[type="text"].required-input-field,
+.stream-form-container input[type="text"].required-input-field {
+	border: 1px solid #FF0000;
+}
+
 #stream-form{
 	position:absolute;
 }
 
-#streamName, .attr-name {
+.stream-form-container .error-message {
+	color: red;
+	padding-top: 3px;
+}
+
+.source-sink-form-container .error-message {
+	color: red;
+	padding: 3px;
+	margin-left: 20px;
+}
+
+.stream-form-container input[type="text"],
+.source-sink-form-container input[type="text"]{
 	width: 200px;
-	border: 0;
-	line-height: 25px;
+	border: 1px solid #716e6e;
+	line-height: 20px;
 	padding: 0 5px;
-	color: black;
+	color: #ccc;
+	background: #424242;
 }
 
-.attr-type {
-    border: 0;
-	line-height: 25px;
-	margin-left: 10px;
-	height: 25px;
-    color: black;
+.source-sink-form-container input[type="text"].option-value {
+	margin-bottom: 2px;
+	margin-left: 20px;
 }
 
-.attr-nav {
+.stream-form-container .attr-nav {
 	margin-left: 10px;
 }
 
-.attribute > .attr-nav > a  {
-	float:left;
+.stream-form-container .attribute .attr-nav  a {
+	float: left;
 	display: inline-block;
-	height: 25px;
+	height: 22px;
 	padding: 0 5px;
-	margin-left: 10px;
-	background: #BDBDBD;
-	color: black;
+	margin-left: 3px;
+	background: #424242;
+	color: #ccc;
+	border: 1px solid #716e6e;
 }
 
-.attribute > .attr-nav > a > .fw-sort-down{
-	font-size: 20px;
-	margin-top: -2px;
+.source-sink-form-container .btn-del-option {
+	display: inline-block;
+	height: 21px;
+	padding: 0 8px;
+	background: #424242;
+	margin-left: 3px;
+	border: 1px solid #716e6e;
 }
 
-.attribute > .attr-nav > a > .fw-sort-up {
-	font-size: 20px;
-	margin-top: 6px
+.source-sink-form-container input[type="text"].attr-key {
+	cursor: not-allowed;
+	background: #1d1d1d;
+	border: 1px solid #545353;
 }
 
-.attribute > .attr-nav > a > .fw-cancel {
-	font-size: 11px;
-	margin-top: 5px;
+.stream-form-container .attribute .attr-nav a .fw-sort-down{
+	font-size: 16px;
+	margin-top: -3px;
+	color: #ccc;
 }
 
-.attr-nav, .attr-content {
+.stream-form-container .attribute .attr-nav a .fw-sort-up {
+	font-size: 16px;
+	margin-top: 6px;
+	color: #ccc;
+}
+
+.clearfix {
+	display: block;
+    content: "";
+    clear: both;
+}
+
+.stream-form-container .attribute .attr-nav a .fw-delete,
+.source-sink-form-container .fw-delete {
+	font-size: 12px;
+	margin-top: 3px;
+	color: #ccc;
+}
+
+.stream-form-container .attr-nav, .stream-form-container .attr-content {
 	display:inline-block;
 	float:left;
 }
 
-.attribute{
+.stream-form-container .attribute,
+.source-sink-form-container .attribute {
 	margin-bottom: 10px;
-	line-height: 25px;
-	height: 25px;
 }
 
-.annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
+.annotation > a > i.jstree-checkbox,
+.annotation > .jstree-clicked > i.jstree-checkbox,
 .annotation > i.jstree-checkbox   {
 	display:none;
 }
 
-.annotation-key > a > i.jstree-checkbox, .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.annotation-key > a > i.jstree-checkbox,
+.annotation-key > .jstree-clicked > i.jstree-checkbox,
 .annotation-key > i.jstree-checkbox   {
 	display:none;
 }
-.annotation-value > a > i.jstree-checkbox, .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.annotation-value > a > i.jstree-checkbox,
+.annotation-value > .jstree-clicked > i.jstree-checkbox,
 .annotation-value > i.jstree-checkbox   {
 	display:none;
 }
 
-.mandatory-key > a > i.jstree-checkbox, .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
+.mandatory-key > a > i.jstree-checkbox,
+.mandatory-key > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
+.mandatory-annotation > a > i.jstree-checkbox,
+.mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.mandatory-annotation > a.jstree-hovered, .mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
+.mandatory-annotation > a.jstree-hovered,
+.mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
 .optional-key > a.jstree-hovered {
 	cursor: context;
 	background: transparent;
 	border-radius: 0px;
 }
 
-#define-annotation {
-	color: white;
-	margin-left: 280px;
+.stream-form-container #define-annotation {
+	color: #ccc;
+}
+
+.source-sink-form-container .cust-option-key {
+	margin-left:20px;
+}
+.source-sink-form-container .cust-option-value {
+	margin-left: 10px;
 }
 
 .stream-form-container {
 	float:left;
 	display:inline-block;
+	width:50%;
+	padding: 5px;
+}
+
+.source-sink-form-container {
+	float:left;
+    display:inline-block;
+    padding: 5px;
+}
+
+.source-div {
+	width: 45%;
+}
+
+.mapper-div {
+	width: 25% ;
+}
+
+.attribute-map-div{
+	width: 30%;
+	margin-top: 48px;
+}
+
+.source-sink-form-container #source-options {
+	display: flex;
+}
+
+.source-sink-form-container .sub-source-options-div {
+	width: 50%;
+}
+
+.stream-form-container #btn-submit,
+.source-sink-form-container #btn-submit {
+	margin-top: 10px;
+}
+
+.source-sink-form-container input[type="checkbox"] {
+	margin: 0px 5px 0px 0;
+	vertical-align: middle;
+}
+
+.source-sink-form-container #attribute-key-label {
+	margin-left: 75px;
+}
+
+.source-sink-form-container #attribute-value-label {
+	margin-left: 175px;
+}
+
+.source-sink-option-value {
+	margin-left: 10px;
+}
+
+.source-sink-map-options .option .option-desc {
+	font-size: 10px;
+	margin-left: 3px;
+	color: #b7f1eb;
+}
+
+.source-sink-map-options .cust-options .option {
+	margin-bottom: 2px;
+}
+
+.source-sink-map-options .option .option-desc-content {
+	 font-family: Arial;
+	 background: #252525;
+	 width: 250px;
+	 color: #eee;
+	 text-align: center;
+	 border-radius: 6px;
+	 padding: 5 5px;
+	 /* Position the tooltip */
+	 position: absolute;
+	 z-index: 1;
+}
+
+.source-sink-form-container .btn-default,
+.stream-form-container .btn-default {
+	color: #ccc;
+    background: #2c2c2c;
+	margin-top: 10px;
+}
+
+.source-sink-form-container .mandatory-option-symbol {
+	margin-right: 12px;
+}
+
+.source-sink-form-container select,
+.stream-form-container select {
+	color: #ccc;
+	background: #424242;
+	border: 1px solid #716e6e;
+	height: 22px;
+}
+.source-sink-form-container .optional-option:hover,
+.source-sink-form-container #attribute-map-label:hover {
+	cursor: pointer;
 }

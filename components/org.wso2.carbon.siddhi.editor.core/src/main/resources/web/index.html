@@ -1085,6 +1085,127 @@
         </li>
 </script>
 
+<script id="source-sink-form-template" type="text/template">
+    {{#ifSourceOrSink id}}
+        <h3>{{addTitle id}}</h3>
+        <label class="clearfix"> * Type </label>
+        <select id="{{id}}-type">
+            <option style="display:none" value ="none" disabled selected value > -- select a type -- </option>
+    {{else}}
+              <h3>Source Mapping</h3>
+              <label class="clearfix"> Map Type </label>
+              <select id="{{id}}-type">
+    {{/ifSourceOrSink}}
+
+            {{#each types}}
+                <option value="{{name}}">{{name}}</option>
+            {{/each}}
+    </select>
+</script>
+
+<script id = "source-sink-options-template" type = "text/template">
+    {{#if options}}
+        <h3> Options </h3>
+        <div id = "{{id}}-options">
+            {{#ifSourceOrSink id}}
+                <div class = "sub-{{id}}-options-div">
+            {{/ifSourceOrSink}}
+            {{#each options}}
+                <div class = "option">
+                {{#if optional}}
+                    {{#if value}}
+                        <div class = "clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class = "option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class = "clearix">
+                            <input class = "option-value" type = "text" value = "{{value}}">
+                        </div>
+                    {{else}}
+                        <div class="clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox"> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class="option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class="clearix">
+                            <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
+                        </div>
+                    {{/if}}
+                        <label class = "error-message"></label>
+                {{else}}
+                    <div class="clearfix">
+                        <label class = "mandatory-option-symbol"> * </label>
+                        <label class = "option-name mandatory-option">
+                            {{key}}
+                        </label>
+                        <i class="fw fw-info option-desc">
+                            <span style="display:none" class="option-desc-content"> {{description}} </span>
+                        </i>
+                    </div>
+                    <div class = "clearix">
+                        <input class = "option-value" type = "text" value = "{{value}}">
+                    </div>
+                    <label class = "error-message"></label>
+                {{/if}}
+                </div>
+            {{#ifSourceOrSink ../id}}
+                {{#if (isDivisor (sum @index 1) ../options)}}
+                    </div>
+                    <div class = "sub-{{../id}}-options-div">
+                {{/if}}
+            {{/ifSourceOrSink}}
+            {{/each}}
+            {{#ifSourceOrSink id}}
+                </div>
+            {{/ifSourceOrSink}}
+    {{/if}}
+    </div>
+    <div class = "customized-options" id = "customized-{{id}}-options">
+        <h3> <i> Customized Options </i> </h3>
+        <ul class = "cust-options">
+            {{#each customizedOptions}}
+                <li class="option">
+                    <div class = "clearfix">
+                        <label> option.key </label>
+                        <input type="text" class="cust-option-key" value="{{key}}">
+                    </div>
+                    <div class = "clearfix">
+                        <label> option.value </label>
+                        <input type = "text" class = "cust-option-value" value = "{{value}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    <label class = "error-message"></label>
+                </li>
+            {{/each}}
+        </ul>
+        <button type = "button" class = "btn btn-default btn-add-options" id = "btn-add-{{id}}-options"> </button>
+    </div>
+</script>
+
+<script id = "source-sink-map-attribute-template" type = "text/template">
+    <div id = "mapper-attributes">
+        <div class = "attribute-labels clearfix">
+                <label id = "attribute-key-label"> Key </label>
+                <label id = "attribute-value-label"> Value </label>
+        </div>
+        {{#each this}}
+        <div class = "attribute">
+                <div class = "clearfix">
+                <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
+                <input type = "text" value = "{{value}}" class = "attr-value"/>
+                </div>
+                <label class = "error-message"></label>
+        </div>
+        {{/each}}
+    </div>
+</script>
 
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
