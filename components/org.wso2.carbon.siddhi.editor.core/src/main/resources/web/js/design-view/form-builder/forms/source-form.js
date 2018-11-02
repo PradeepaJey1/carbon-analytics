@@ -600,6 +600,17 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     changeCustOptDiv();
                 });
 
+                //event listener for attribute-map checkbox
+				$('#define-attribute').on('change', '#attributeMap-check-box', function () {
+					if ($(this).is(':checked')) {
+						var attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+						$('#attribute-map-content').show();
+						renderAttributeMappingContent(attributes)
+					} else {
+						$('#attribute-map-content').hide();
+					}
+				});
+
                 //get the clicked element's information
                 var type = clickedElement.getType();
                 var savedSourceOptions = clickedElement.getOptions();
@@ -687,17 +698,6 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                     renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
                 }
-
-                //event listener for attribute-map checkbox
-                $('#define-attribute').on('change', '#attributeMap-check-box', function () {
-                    if ($(this).is(':checked')) {
-                        var attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
-                        $('#attribute-map-content').show();
-                        renderAttributeMappingContent(attributes)
-                    } else {
-                        $('#attribute-map-content').hide();
-                    }
-                })
 
                 //onchange of map type selection
                 $('#define-map').on('change', '#map-type', function () {
