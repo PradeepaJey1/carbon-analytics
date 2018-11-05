@@ -673,7 +673,8 @@ a.list-group-item, button.list-group-item {
 	border: 1px solid #716e6e;
 }
 
-.source-sink-form-container input[type="text"].attr-key {
+.source-sink-form-container input[type="text"].attr-key,
+.source-sink-form-container #attributeMap-type:disabled {
 	cursor: not-allowed;
 	background: #1d1d1d;
 	border: 1px solid #545353;
@@ -773,7 +774,8 @@ a.list-group-item, button.list-group-item {
     padding: 5px;
 }
 
-.source-div {
+.source-div,
+.sink-div {
 	width: 45%;
 }
 
@@ -786,17 +788,19 @@ a.list-group-item, button.list-group-item {
 	margin-top: 48px;
 }
 
-.source-sink-form-container #source-options {
+.source-sink-form-container #source-options,
+.source-sink-form-container #sink-options {
 	display: flex;
 }
 
-.source-sink-form-container .sub-source-options-div {
+.source-sink-form-container .sub-source-options-div,
+.source-sink-form-container .sub-sink-options-div {
 	width: 50%;
 }
 
 .stream-form-container #btn-submit,
 .source-sink-form-container #btn-submit {
-	margin-top: 10px;
+	margin-top: 15px;
 }
 
 .source-sink-form-container input[type="checkbox"] {
@@ -806,10 +810,7 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container #attribute-key-label {
 	margin-left: 75px;
-}
-
-.source-sink-form-container #attribute-value-label {
-	margin-left: 175px;
+	margin-right: 175px;
 }
 
 .source-sink-option-value {
@@ -831,7 +832,7 @@ a.list-group-item, button.list-group-item {
 	 background: #252525;
 	 width: 250px;
 	 color: #eee;
-	 text-align: center;
+	 text-align: left;
 	 border-radius: 6px;
 	 padding: 5 5px;
 	 /* Position the tooltip */
@@ -843,7 +844,7 @@ a.list-group-item, button.list-group-item {
 .stream-form-container .btn-default {
 	color: #ccc;
     background: #2c2c2c;
-	margin-top: 10px;
+	margin-top: 15px;
 }
 
 .source-sink-form-container .mandatory-option-symbol {
@@ -857,7 +858,12 @@ a.list-group-item, button.list-group-item {
 	border: 1px solid #716e6e;
 	height: 22px;
 }
+
 .source-sink-form-container .optional-option:hover,
 .source-sink-form-container #attribute-map-label:hover {
 	cursor: pointer;
+}
+
+.source-sink-form-container .attribute-labels {
+	margin-top: 10px;
 }
