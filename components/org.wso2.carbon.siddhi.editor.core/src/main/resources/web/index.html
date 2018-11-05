@@ -1092,9 +1092,9 @@
         <h3>{{addTitle id}}</h3>
         <label class="clearfix"> * Type </label>
         <select id="{{id}}-type">
-            <option style="display:none" value ="none" disabled selected value > -- select a type -- </option>
+            <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
-              <h3>Source Mapping</h3>
+              <h3> Mapping </h3>
               <label class="clearfix"> Map Type </label>
               <select id="{{id}}-type">
     {{/ifSourceOrSink}}
@@ -1194,13 +1194,13 @@
 <script id = "source-sink-map-attribute-template" type = "text/template">
     <div id = "mapper-attributes">
         <div class = "attribute-labels clearfix">
-                <label id = "attribute-key-label"> Key </label>
+                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
                 <label id = "attribute-value-label"> Value </label>
         </div>
         {{#each this}}
         <div class = "attribute">
                 <div class = "clearfix">
-                <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
+                {{#if key }} <input type = "text" value = "{{key}}" class = "attr-key" readonly/> {{/if}}
                 <input type = "text" value = "{{value}}" class = "attr-value"/>
                 </div>
                 <label class = "error-message"></label>
