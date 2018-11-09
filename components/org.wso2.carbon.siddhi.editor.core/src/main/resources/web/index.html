@@ -1087,15 +1087,17 @@
         </li>
 </script>
 
-<script id="source-sink-form-template" type="text/template">
+<script id="source-sink-map-store-form-template" type="text/template">
     {{#ifSourceOrSink id}}
-        <h3>{{addTitle id}}</h3>
+        <h3>{{addTitle id}} Configuration</h3>
         <label class="clearfix"> * Type </label>
         <select id="{{id}}-type">
             <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
-              <h3> Mapping </h3>
-              <label class="clearfix"> Map Type </label>
+             {{#ifId id "map"}}
+                <h3> Mapping </h3>
+             {{/ifId}}
+              <label class="clearfix"> {{addTitle id}} Type </label>
               <select id="{{id}}-type">
     {{/ifSourceOrSink}}
 
@@ -1105,13 +1107,13 @@
     </select>
 </script>
 
-<script id = "source-sink-options-template" type = "text/template">
+<script id = "source-sink-store-options-template" type = "text/template">
     {{#if options}}
         <h3> Options </h3>
         <div id = "{{id}}-options">
-            {{#ifSourceOrSink id}}
+            {{#ifSourceOrSinkOrStore id}}
                 <div class = "sub-{{id}}-options-div">
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
             {{#each options}}
                 <div class = "option">
                 {{#if optional}}
@@ -1157,16 +1159,16 @@
                     <label class = "error-message"></label>
                 {{/if}}
                 </div>
-            {{#ifSourceOrSink ../id}}
+            {{#ifSourceOrSinkOrStore ../id}}
                 {{#if (isDivisor (sum @index 1) ../options)}}
                     </div>
                     <div class = "sub-{{../id}}-options-div">
                 {{/if}}
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
             {{/each}}
-            {{#ifSourceOrSink id}}
+            {{#ifSourceOrSinkOrStore id}}
                 </div>
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
     {{/if}}
     </div>
     <div class = "customized-options" id = "customized-{{id}}-options">

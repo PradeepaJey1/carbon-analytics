@@ -38,31 +38,24 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-        /**
-         * Generates the current index of the option being rendered
-         */
+
+        /** Generates the current index of the option being rendered */
         Handlebars.registerHelper('sum', function () {
             return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
         });
 
-        /**
-         * Handlebar helper to check if the index is equivalent to half the length of the option's array
-         */
+        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
         Handlebars.registerHelper('isDivisor', function (index, options) {
             var divLength = Math.ceil(options.length / 2);
             return index === divLength;
         });
 
-        /**
-         * Handlebar helper to render heading for the form
-         */
+        /** Handlebar helper to render heading for the form */
         Handlebars.registerHelper('addTitle', function (id) {
-            return id.charAt(0).toUpperCase() + id.slice(1) + " Configuration";
+            return id.charAt(0).toUpperCase() + id.slice(1);
         });
 
-        /**
-         * Handlebar helper to compare if the id is "source" or "sink"
-         */
+        /** Handlebar helper to compare if the id is "source" or "sink" */
         Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
             if (id === "source" || id === "sink") {
                 return div.fn(this);
@@ -70,10 +63,26 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return div.inverse(this);
         });
 
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
+            if (id === "source" || id === "sink" || id === "store") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to check id is equivalent to a given string */
+        Handlebars.registerHelper('ifId', function (id, name, div) {
+            if (id === name) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
         /**
-         * Function to get the options of the selected source/map type
-         * @param {String} selectedType Selected source/map type
-         * @param {object} types Predefined source/map types
+         * Function to get the options of the selected sink/map type
+         * @param {String} selectedType Selected sink/map type
+         * @param {object} types Predefined sink/map types
          * @return {object} options
          */
         var getSelectedTypeOptions = function (selectedType, types) {
@@ -88,7 +97,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-         * Function to render the options for the selected map/source type using handlebars
+         * Function to render the options for the selected map/sink type using handlebars
          * @param {Object} optionsArray Saved options
          * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
          * @param {String} id Id for the div to embed the options
@@ -99,7 +108,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 else if (!val1.optional && val2.optional) return -1;
                 else return 0;
             });
-            var sourceOptionsTemplate = Handlebars.compile($('#source-sink-options-template').html());
+            var sourceOptionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html());
             var wrappedHtml = sourceOptionsTemplate({
                 id: id,
                 options: optionsArray,
@@ -115,7 +124,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderMap = function (predefined_source_maps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#source-sink-form-template').html());
+                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefined_source_maps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
@@ -124,8 +133,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-         * Function to map the option values from the source view to the option object
-         * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
+         * Function to map the saved option values to the option object
+         * @param {Object} predefinedOptions Predefined options of a particular sink/map annotation type
          * @param {Object} savedOptions Saved options
          * @return {Object} options
         */
@@ -197,7 +206,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             });
             return customizedOptions;
-        }
+        };
 
         /**
         * Function to sort alphabetically an array of objects by some specific key.
@@ -216,7 +225,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     return a[property].localeCompare(b[property]);
                 }
             }
-        }
+        };
 
         /**
          * Function to create option object with an additional empty value attribute
@@ -235,7 +244,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-         * Function to create attribute-map object with the user given values in source view
+         * Function to create attribute-map object with the saved attribute-map
          * @param {Object} savedMapperAttributes Saved attribute-map
          * @param {Object} streamAttributes Attributes of the connected stream
          * @return {Object} attributes
@@ -272,7 +281,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 attributes.push({ value: attributeValues[0] });
             }
             return attributes;
-        }
+        };
 
         /**
          * Function to create attribute-map objects with empty values
@@ -356,7 +365,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 });
             }
             return isError;
-        }
+        };
 
         /**
          * Function to obtain a particular option from predefined option
@@ -377,15 +386,21 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
         * Function to validate the data type of the options
+        * @param {String} dataType data-type of the option
+        * @param {String} optionValue value of the option
+        * @return {boolean} invalidDataType
         */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
+            intLongRegexMatch = /^[-+]?\d+$/;
+            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+
             if (dataType === "INT" || dataType === "LONG") {
-                if (!optionValue.match(/^[-+]?\d+$/)) {
+                if (!optionValue.match(intLongRegexMatch)) {
                     invalidDataType = true;
                 }
             } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
-                if (!optionValue.match(/^[+-]?([0-9]*[.])?[0-9]+$/)) {
+                if (!optionValue.match(doubleFloatRegexMatch)) {
                     invalidDataType = true;
                 }
             } else if (dataType === "BOOL") {
@@ -394,11 +409,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             }
             return invalidDataType;
-        }
+        };
 
-        /**
-        * Function to change the heading and the button text of the customized options div
-        */
+        /** Function to change the heading and the button text of the customized options div */
         var changeCustOptDiv = function () {
             var sourceCustOptionList = $('.source-sink-map-options #customized-sink-options').
                 find('.cust-options li');
@@ -479,7 +492,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             });
             return isError;
-        }
+        };
 
         /**
          * @function generate form when defining a form
@@ -553,7 +566,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
-                //remove class
+                //remove element error class
                 if ($('#' + id).hasClass('not-connected-source-sink')) {
                     $('#' + id).removeClass('not-connected-source-sink');
                 }
@@ -564,10 +577,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
                     '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
                     '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button> </div>' +
-                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"></div>' +
-                    '<div class="source-sink-map-options" id="mapper-options-div"></div></div>' +
-                    '<div class= "source-sink-form-container attribute-map-div"><div id="define-attribute"> </div>' +
-                    '<div id="attribute-map-content"></div> </div>');
+                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div>' +
+                    '<div class="source-sink-map-options" id="mapper-options-div"></div>' +
+                    '</div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
+                    '</div> <div id="attribute-map-content"></div> </div>');
                 formContainer.append(propertyDiv);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -598,7 +611,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     } else {
                         $(this).parents(".option").find(".option-value").hide();
                         if ($(this).parents(".option").find(".option-value").hasClass("required-input-field")) {
-                            $(this).parents(".option").find(".option-value").removeClass("required-input-field")
+                            $(this).parents(".option").find(".option-value").removeClass("required-input-field");
                         }
                         $(this).parents(".option").find(".error-message").text("");
                     }
@@ -609,7 +622,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     'value=""> </div> <div class="clearfix"> <label>option.value</label> ' +
                     '<input type="text" class="cust-option-value" value="">' +
                     '<a class = "btn-del btn-del-option"><i class="fw fw-delete"></i></a></div>' +
-                    '<label class = "error-message"></label></li>'
+                    '<label class = "error-message"></label></li>';
 
                 //onclick to add customized sink option
                 $('#sink-options-div').on('click', '#btn-add-sink-options', function () {
@@ -636,7 +649,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         if (map !== undefined && map.getPayloadOrAttribute() !== undefined) {
                             attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
                         } else {
-                            attributes = initialiseAttributeContent(streamAttributes)
+                            attributes = initialiseAttributeContent(streamAttributes);
                         }
                         $('#attribute-map-content').show();
                         renderAttributeMappingContent(attributes)
@@ -653,7 +666,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var map = clickedElement.getMap();
 
                 //render the template to select the sink type
-                var sinkFormTemplate = Handlebars.compile($('#source-sink-form-template').html());
+                var sinkFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
                 var wrappedHtml = sinkFormTemplate({ id: "sink", types: predefined_sinks });
                 $('#define-sink').html(wrappedHtml);
 
@@ -663,8 +676,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if (type !== undefined && (type.toLowerCase() == this.value.toLowerCase()) && savedSinkOptions
                         !== undefined) {
                         //if the selected type is same as the saved sink-type
-                        sinkOptionsWithValues = mapUserOptionValues(sinkOptions, savedSinkOptions)
-                        customizedSinkOptions = getCustomizedOptions(sinkOptions, savedSinkOptions)
+                        sinkOptionsWithValues = mapUserOptionValues(sinkOptions, savedSinkOptions);
+                        customizedSinkOptions = getCustomizedOptions(sinkOptions, savedSinkOptions);
                     } else {
                         sinkOptionsWithValues = createOptionObjectWithValues(sinkOptions);
                         customizedSinkOptions = [];
@@ -688,14 +701,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     sinkOptions = getSelectedTypeOptions(type, predefined_sinks);
                     if (savedSinkOptions !== undefined) {
                         //get the savedSourceoptions values and map it
-                        sinkOptionsWithValues = mapUserOptionValues(sinkOptions, savedSinkOptions)
-                        customizedSinkOptions = getCustomizedOptions(sinkOptions, savedSinkOptions)
+                        sinkOptionsWithValues = mapUserOptionValues(sinkOptions, savedSinkOptions);
+                        customizedSinkOptions = getCustomizedOptions(sinkOptions, savedSinkOptions);
                     } else {
                         //create option object with empty values
                         sinkOptionsWithValues = createOptionObjectWithValues(sinkOptions);
                         customizedSinkOptions = [];
                     }
-                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, "sink")
+                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, "sink");
                     if (map === undefined) {
                         renderMap(predefined_sink_maps);
                         customizedMapperOptions = [];
@@ -721,20 +734,20 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         mapperOptions = getSelectedTypeOptions(mapperType, predefined_sink_maps);
                         if (savedMapperOptions !== undefined) {
                             //get the savedMapoptions values and map it
-                            mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions)
-                            customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions)
+                            mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions);
+                            customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions);
                         } else {
                             //create option object with empty values
                             mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                             customizedMapperOptions = [];
                         }
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
                     }
                     if (savedMapperAttributes !== undefined) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
                         $('#define-attribute #attributeMap-type').prop('disabled', false);
                         attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
-                        renderAttributeMappingContent(attributes)
+                        renderAttributeMappingContent(attributes);
                     }
                 }
 
@@ -745,13 +758,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if ((map !== undefined) && (mapperType !== undefined) && (mapperType.toLowerCase() == this
                         .value.toLowerCase()) && savedMapperOptions !== undefined) {
                         //if the selected type is same as the saved map type
-                        mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions)
-                        customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions)
+                        mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions);
+                        customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions);
                     } else {
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                         customizedMapperOptions = [];
                     }
-                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
                     if (map === undefined || (map !== undefined && savedMapperAttributes === undefined)) {
                         renderAttributeMapping();
                         attributes = initialiseAttributeContent(streamAttributes)
@@ -791,7 +804,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
-                    //clear the errors
+                    //clear the error classes
                     $('.error-message').text("")
                     $('.required-input-field').removeClass('required-input-field');
 
@@ -907,3 +920,4 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
         return SinkForm;
     });
+
