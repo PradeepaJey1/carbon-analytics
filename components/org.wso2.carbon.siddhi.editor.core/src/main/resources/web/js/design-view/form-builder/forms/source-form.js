@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
+define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
     'jsonValidator', 'handlebar', 'designViewUtils'],
-    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
+    function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
         DesignViewUtils) {
 
         /**
@@ -38,33 +38,41 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             }
         };
 
-		/**
-		* Generates the current index of the option being rendered
-		*/
+        /** Generates the current index of the option being rendered */
         Handlebars.registerHelper('sum', function () {
             return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
         });
 
-		/**
-		 * Handlebar helper to check if the index is equivalent to half the length of the option's array
-		 */
+        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
         Handlebars.registerHelper('isDivisor', function (index, options) {
             var divLength = Math.ceil(options.length / 2);
             return index === divLength;
         });
 
-        /**
-         * Handlebar helper to render heading for the form
-         */
+        /** Handlebar helper to render heading for the form */
         Handlebars.registerHelper('addTitle', function (id) {
-            return id.charAt(0).toUpperCase() + id.slice(1) + " Configuration";
+            return id.charAt(0).toUpperCase() + id.slice(1);
         });
 
-        /**
-         * Handlebar helper to compare if the id is "source" or "sink"
-         */
+        /** Handlebar helper to compare if the id is "source" or "sink" */
         Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
             if (id === "source" || id === "sink") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
+            if (id === "source" || id === "sink" || id === "store") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to check id is equivalent to a given string */
+        Handlebars.registerHelper('ifId', function (id, name, div) {
+            if (id === name) {
                 return div.fn(this);
             }
             return div.inverse(this);
@@ -99,7 +107,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 else if (!val1.optional && val2.optional) return -1;
                 else return 0;
             });
-            var sourceOptionsTemplate = Handlebars.compile($('#source-sink-options-template').html());
+            var sourceOptionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html());
             var wrappedHtml = sourceOptionsTemplate({
                 id: id,
                 options: optionsArray,
@@ -115,7 +123,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
          */
         var renderMap = function (predefined_source_maps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#source-sink-form-template').html());
+                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefined_source_maps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
@@ -193,7 +201,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 }
             });
             return customizedOptions;
-        }
+        };
 
 		/**
          * Function to sort alphabetically an array of objects by some specific key.
@@ -212,7 +220,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     return a[property].localeCompare(b[property]);
                 }
             }
-        }
+        };
 
         /**
          * Function to create option object with an additional empty value attribute
@@ -267,7 +275,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 }
             }
             return attributes;
-        }
+        };
 
         /**
          * Function to render the attribute-map div using handlebars
@@ -277,7 +285,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
             var wrappedHtml = attributeMapFormTemplate(attributes);
             $('#attribute-map-content').html(wrappedHtml);
-        }
+        };
 
         /**
          * Function to obtain the connected stream's attributes
@@ -333,7 +341,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 });
             }
             return isError;
-        }
+        };
 
         /**
          * Function to obtain a particular option from predefined option
@@ -353,16 +361,22 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
         };
 
 		/**
-		* Function to validate the data type of the options
+        * Function to validate the data type of the options
+        * @param {String} dataType data-type of the option
+        * @param {String} optionValue value of the option
+        * @return {boolean} invalidDataType
 		*/
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
+            intLongRegexMatch = /^[-+]?\d+$/;
+            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+
             if (dataType === "INT" || dataType === "LONG") {
-                if (!optionValue.match(/^[-+]?\d+$/)) {
+                if (!optionValue.match(intLongRegexMatch)) {
                     invalidDataType = true;
                 }
             } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
-                if (!optionValue.match(/^[+-]?([0-9]*[.])?[0-9]+$/)) {
+                if (!optionValue.match(doubleFloatRegexMatch)) {
                     invalidDataType = true;
                 }
             } else if (dataType === "BOOL") {
@@ -371,14 +385,13 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 }
             }
             return invalidDataType;
-        }
+        };
 
-		/**
-		* Function to change the heading and the button text of the customized options div
-		*/
+
+        /** Function to change the heading and the button text of the customized options div */
         var changeCustOptDiv = function () {
             var sourceCustOptionList = $('.source-sink-map-options #customized-source-options').
-            	find('.cust-options li');
+                find('.cust-options li');
             if (sourceCustOptionList.length > 0) {
                 $('.source-sink-map-options #customized-source-options').find('h3').show();
                 $('.source-sink-map-options #customized-source-options').find('.btn-add-options').html('Add more');
@@ -388,7 +401,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     html('Add customized option');
             }
             var mapperCustOptionList = $('.source-sink-map-options #customized-mapper-options').
-            	find('.cust-options li');
+                find('.cust-options li');
             if (mapperCustOptionList.length > 0) {
                 $('.source-sink-map-options #customized-mapper-options').find('h3').show();
                 $('.source-sink-map-options #customized-mapper-options').find('.btn-add-options').html('Add more');
@@ -456,7 +469,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 }
             });
             return isError;
-        }
+        };
 
         /**
          * @function generate form when defining a form
@@ -542,10 +555,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
                     '<div class = "source-sink-map-options" id="source-options-div"></div>' +
                     '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button> </div>' +
-                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"></div>' +
-                    '<div class="source-sink-map-options" id="mapper-options-div"></div></div>' +
-                    '<div class= "source-sink-form-container attribute-map-div"><div id="define-attribute"> </div>' +
-                    '<div id="attribute-map-content"></div> </div>');
+                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
+                    '<div class="source-sink-map-options" id="mapper-options-div">' +
+                    '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
+                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div>');
                 formContainer.append(propertyDiv);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -624,7 +637,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var map = clickedElement.getMap();
 
                 //render the template to select the source type
-                var sourceFormTemplate = Handlebars.compile($('#source-sink-form-template').html());
+                var sourceFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
                 var wrappedHtml = sourceFormTemplate({ id: "source", types: predefined_sources });
                 $('#define-source').html(wrappedHtml);
 
@@ -634,8 +647,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     if (type !== undefined && (type.toLowerCase() == this.value.toLowerCase()) && savedSourceOptions
                         !== undefined) {
                         //if the selected type is same as the saved source-type
-                        sourceOptionsWithValues = mapUserOptionValues(sourceOptions, savedSourceOptions)
-                        customizedSourceOptions = getCustomizedOptions(sourceOptions, savedSourceOptions)
+                        sourceOptionsWithValues = mapUserOptionValues(sourceOptions, savedSourceOptions);
+                        customizedSourceOptions = getCustomizedOptions(sourceOptions, savedSourceOptions);
                     } else {
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
                         customizedSourceOptions = [];
@@ -659,8 +672,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     sourceOptions = getSelectedTypeOptions(type, predefined_sources);
                     if (savedSourceOptions !== undefined) {
                         //get the savedSourceoptions values and map it
-                        sourceOptionsWithValues = mapUserOptionValues(sourceOptions, savedSourceOptions)
-                        customizedSourceOptions = getCustomizedOptions(sourceOptions, savedSourceOptions)
+                        sourceOptionsWithValues = mapUserOptionValues(sourceOptions, savedSourceOptions);
+                        customizedSourceOptions = getCustomizedOptions(sourceOptions, savedSourceOptions);
                     } else {
                         //create option object with empty values
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
@@ -692,19 +705,19 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         mapperOptions = getSelectedTypeOptions(mapperType, predefined_source_maps);
                         if (savedMapperOptions !== undefined) {
                             //get the savedMapoptions values and map it
-                            mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions)
-                            customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions)
+                            mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions);
+                            customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions);
                         } else {
                             //create option object with empty values
                             mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                             customizedMapperOptions = [];
                         }
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
                     }
                     if (savedMapperAttributes !== undefined) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
                         attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
-                        renderAttributeMappingContent(attributes)
+                        renderAttributeMappingContent(attributes);
                     }
                 }
 
@@ -715,8 +728,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     if ((map !== undefined) && (mapperType !== undefined) && (mapperType.toLowerCase() == this
                         .value.toLowerCase()) && savedMapperOptions !== undefined) {
                         //if the selected type is same as the saved map type
-                        mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions)
-                        customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions)
+                        mapperOptionsWithValues = mapUserOptionValues(mapperOptions, savedMapperOptions);
+                        customizedMapperOptions = getCustomizedOptions(mapperOptions, savedMapperOptions);
                     } else {
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                         customizedMapperOptions = [];
@@ -730,7 +743,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         renderAttributeMapping();
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
                         attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
-                        renderAttributeMappingContent(attributes)
+                        renderAttributeMappingContent(attributes);
                     }
                 });
 
@@ -786,7 +799,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                                 var key = $(this).find('.attr-key').val().trim();
                                 var value = $(this).find('.attr-value').val().trim();
                                 if (value == "") {
-                                    $(this).find('.error-message').text('Attribute value is not filled.')
+                                    $(this).find('.error-message').text('Attribute value is not filled.');
                                     $(this)[0].scrollIntoView();
                                     $(this).find('.attr-value').addClass('required-input-field');
                                     isError = true;
