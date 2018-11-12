@@ -1211,6 +1211,43 @@
     </div>
 </script>
 
+<script id = "table-store-annotation-template" type = "text/template">
+    <h4> Annotations </h4>
+    <div id = "table-annotations">
+            {{#each this}}
+                <div class = "clearfix table-annotation">
+                    <div class="clearfix">
+                        <label class = "annotation-name">
+                            {{#if isChecked}}
+                                <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
+                            {{else}}
+                                <input type = "checkbox" class="annotation-checkbox"> @{{name}}
+                            {{/if}}
+                        </label>
+                    </div>
+                    {{#if isChecked}}
+                        <div class="annotation-content">
+                     {{else}}
+                            <div class="annotation-content" style="display:none">
+                    {{/if}}
+                        <ul>
+                        {{#each values}}
+                            <li class = "clearfix table-annotation-value">
+                                <div class="clearfix">
+                                    <input type = "text" value = "{{value}}" class = "annotation-value"/>
+                                    <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
+                                </div>
+                                <label class="error-message"></label>
+                            </li>
+                        {{/each}}
+                        </ul>
+                        <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
+                    </div>
+                </div>
+            {{/each}}
+    </div>
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -1519,6 +1556,22 @@
                         isMandatory: true
                     },
                 ]
+            }
+            ],
+            table_predefined_annotations: [
+            {
+                name: "primaryKey",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
+            },
+            {
+                name: "index",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
             }
             ],
             services:   {

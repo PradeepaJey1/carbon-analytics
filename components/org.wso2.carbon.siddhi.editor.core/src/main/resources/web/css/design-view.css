@@ -635,7 +635,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container .error-message,
-.table-form-container #define-store-options .error-message {
+.table-form-container #define-store-options .error-message,
+.design-view-form-content #define-table-annotation .error-message {
 	color: red;
 	padding: 3px;
 	margin-left: 20px;
@@ -653,7 +654,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container input[type="text"].option-value,
-.table-form-container input[type="text"].option-value{
+.table-form-container input[type="text"].option-value,
+.table-form-container input[type="text"].annotation-value {
 	margin-bottom: 2px;
 	margin-left: 20px;
 }
@@ -677,7 +679,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container .btn-del-option,
-.table-form-container .btn-del-option {
+.table-form-container .btn-del-option,
+.table-form-container .btn-del-annot-value {
 	display: inline-block;
 	height: 21px;
 	padding: 0 8px;
@@ -816,6 +819,16 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .store-div {
 	width: 35%;
+	margin-top: 20px;
+}
+
+.design-view-form-content #define-table-annotation {
+	width: 30%;
+	margin-top: 10px;
+}
+
+.table-form-container #table-annotations .table-annotation {
+	margin-bottom: 10px;
 }
 
 .attribute-map-div {
@@ -887,6 +900,11 @@ a.list-group-item, button.list-group-item {
 	color: #ccc;
     background: #2c2c2c;
 	margin-top: 15px;
+}
+
+.table-form-container #table-annotations .btn-add-annot-value {
+	margin-top: 0px;
+    margin-bottom: 10px;
 }
 
 .source-sink-form-container .mandatory-option-symbol,
