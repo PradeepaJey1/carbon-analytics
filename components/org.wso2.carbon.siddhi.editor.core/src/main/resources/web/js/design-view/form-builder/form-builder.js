@@ -172,7 +172,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          * @param i id for the element
          * @returns user given source name
          */
-        FormBuilder.prototype.DefineSource = function (i) {
+        FormBuilder.prototype.DefineSource = function (newAgent, i, dropElement, top, left) {
             var self = this;
             var formConsole = this.createTabForForm(i, constants.SOURCE);
             var formContainer = formConsole.getContentContainer();
@@ -181,8 +181,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElement', dropElement);
+            _.set(formOptions, 'newAgent', newAgent);
             var sourceForm = new SourceForm(formOptions);
-            sourceForm.generateDefineForm(i, formConsole, formContainer);
+            sourceForm.generateDefineForm(i, formConsole, formContainer, top, left);
         };
 
         /**
@@ -207,7 +209,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          * @param i id for the element
          * @returns user given sink name
          */
-        FormBuilder.prototype.DefineSink = function (i) {
+        FormBuilder.prototype.DefineSink = function (newAgent, i, dropElement, top, left) {
             var self = this;
             var formConsole = this.createTabForForm(i, constants.SINK);
             var formContainer = formConsole.getContentContainer();
@@ -216,8 +218,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElement', dropElement);
+            _.set(formOptions, 'newAgent', newAgent);
             var sinkForm = new SinkForm(formOptions);
-            sinkForm.generateDefineForm(i, formConsole, formContainer);
+            sinkForm.generateDefineForm(i, formConsole, formContainer, top, left);
         };
 
         /**
