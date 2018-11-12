@@ -275,16 +275,14 @@ td {
 }
 
 .connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
-.connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink,
-.connectorInSource {
+.connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink {
     float: left;
     margin-top: -53px;
     margin-left: -5px;
 }
 
 .connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
-.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource,
-.connectorOutSink {
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource {
     float: right;
     margin-top: -53px;
     margin-right: -5px;
