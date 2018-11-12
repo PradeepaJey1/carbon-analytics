@@ -65,60 +65,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
-            var name;
             if (isCodeToDesignMode) {
-                name = sourceName;
+                this.generateSourceConnectionElements(newAgent, sourceName, i, top, left);
             } else {
-                name = self.formBuilder.DefineSource(i);
+                self.formBuilder.DefineSource(newAgent, i, self, top, left);
             }
-            var node = $('<div>' + name + '</div>');
-            newAgent.append(node);
-            node.attr('id', i + "-nodeInitial");
-            node.attr('class', "sourceNameNode");
-
-            /*
-             prop --> When clicked on this icon, a definition and related information of the Source Element will
-             be displayed in a form
-            */
-            var settingsIconId = "" + i + "-dropSourceSettingsId";
-            var prop = $('<i id="' + settingsIconId + '" ' +
-                'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
-
-            var settingsIconElement = $('#' + settingsIconId)[0];
-            settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForSources(this);
-            });
-
-            var finalElement = newAgent;
-
-            /*
-             connection --> The connection anchor point is appended to the element
-             */
-            var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
-
-            finalElement.append(connection);
-
-            finalElement.css({
-                'top': top,
-                'left': left
-            });
-
-            $(self.container).append(finalElement);
-
-            self.jsPlumbInstance.draggable(finalElement, {
-                containment: true,
-                start: function (e) {
-                    finalElement.attr('data-x', e.e.clientX);
-                    finalElement.attr('data-y', e.e.clientY);
-                }
-            });
-
-            self.jsPlumbInstance.makeSource(connection, {
-                deleteEndpointsOnDetach: true,
-                anchor: 'Right',
-                maxConnections: 1
-            });
         };
 
         /**
@@ -135,58 +86,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var self = this;
             var name;
             if (isCodeToDesignMode) {
-                name = sinkName;
+                this.generateSinkConnectionElements(newAgent, sinkName, i, top, left);
             } else {
-                name = self.formBuilder.DefineSink(i);
+                self.formBuilder.DefineSink(newAgent, i, self, top, left);
             }
-            var node = $('<div>' + name + '</div>');
-            newAgent.append(node);
-            node.attr('id', i + "-nodeInitial");
-            node.attr('class', "sinkNameNode");
-
-            /*
-             prop --> When clicked on this icon, a definition and related information of the Sink Element will
-             be displayed in a form
-            */
-            var settingsIconId = "" + i + "-dropSinkSettingsId";
-            var prop = $('<i id="' + settingsIconId + '" ' +
-                'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
-
-            var settingsIconElement = $('#' + settingsIconId)[0];
-            settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForSinks(this);
-            });
-
-            var finalElement = newAgent;
-
-            /*
-             connection --> The connection anchor point is appended to the element
-             */
-            var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
-
-            finalElement.append(connection);
-
-            finalElement.css({
-                'top': top,
-                'left': left
-            });
-
-            $(self.container).append(finalElement);
-
-            self.jsPlumbInstance.draggable(finalElement, {
-                containment: true,
-                start: function (e) {
-                    finalElement.attr('data-x', e.e.clientX);
-                    finalElement.attr('data-y', e.e.clientY);
-                }
-            });
-
-            self.jsPlumbInstance.makeTarget(connection, {
-                deleteEndpointsOnDetach: true,
-                anchor: 'Left',
-                maxConnections: 1
-            });
         };
 
         /**
@@ -1264,6 +1167,199 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount()
                         - noOfElementsInsidePartition);
             });
+        };
+
+        DropElements.prototype.generateSinkConnectionElements = function (newAgent, type, i, top, left) {
+
+            var self = this;
+            var node = $('<div>' + type + '</div>');
+            newAgent.append(node);
+            node.attr('id', i + "-nodeInitial");
+            node.attr('class', "sinkNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Sink Element will
+             be displayed in a form
+            */
+            var settingsIconId = "" + i + "-dropSinkSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
+
+            var settingsIconElement = $('#' + settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSinks(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            if (type == "http-request") {
+                var connectionOut = $('<div class="connectorOutSink">').attr('id', i + "-out").addClass('connection');
+                finalElement.append(connectionOut);
+
+                self.jsPlumbInstance.makeSource(connectionOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
+                });
+            }
+            var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
+
+            finalElement.append(connection);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true,
+                start: function (e) {
+                    finalElement.attr('data-x', e.e.clientX);
+                    finalElement.attr('data-y', e.e.clientY);
+                }
+            });
+
+            self.jsPlumbInstance.makeTarget(connection, {
+                deleteEndpointsOnDetach: true,
+                anchor: 'Left',
+                maxConnections: 1
+            });
+        };
+
+        DropElements.prototype.generateSinkConnectionElements = function (newAgent, type, i, top, left) {
+
+            var self = this;
+            var node = $('<div>' + type + '</div>');
+            newAgent.append(node);
+            node.attr('id', i + "-nodeInitial");
+            node.attr('class', "sinkNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Sink Element will
+             be displayed in a form
+            */
+            var settingsIconId = "" + i + "-dropSinkSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
+
+            var settingsIconElement = $('#' + settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSinks(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            if (type == "http-request") {
+                var connectionOut = $('<div class="connectorOutSink">').attr('id', i + "-out").addClass('connection');
+                finalElement.append(connectionOut);
+
+                self.jsPlumbInstance.makeSource(connectionOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
+                });
+            }
+            var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
+
+            finalElement.append(connection);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true,
+                start: function (e) {
+                    finalElement.attr('data-x', e.e.clientX);
+                    finalElement.attr('data-y', e.e.clientY);
+                }
+            });
+
+            self.jsPlumbInstance.makeTarget(connection, {
+                deleteEndpointsOnDetach: true,
+                anchor: 'Left',
+                maxConnections: 1
+            });
+        };
+
+        DropElements.prototype.generateSourceConnectionElements = function (newAgent, type, i, top, left) {
+
+            var self = this;
+            var node = $('<div>' + type + '</div>');
+            newAgent.append(node);
+            node.attr('id', i + "-nodeInitial");
+            node.attr('class', "sourceNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Source Element will
+             be displayed in a form
+            */
+            var settingsIconId = "" + i + "-dropSourceSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
+
+            var settingsIconElement = $('#' + settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSources(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            if (type == "http-response") {
+                var connectionIn = $('<div class="connectorInSource">').attr('id', i + "-in").addClass('connection');
+                finalElement.append(connectionIn);
+
+                self.jsPlumbInstance.makeTarget(connectionIn, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left',
+                    maxConnections: 1,
+
+                });
+            }
+            var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
+
+            finalElement.append(connection);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true,
+                start: function (e) {
+                    finalElement.attr('data-x', e.e.clientX);
+                    finalElement.attr('data-y', e.e.clientY);
+                }
+            });
+
+            self.jsPlumbInstance.makeSource(connection, {
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right',
+                maxConnections: 1
+            });
+
         };
 
         return DropElements;
