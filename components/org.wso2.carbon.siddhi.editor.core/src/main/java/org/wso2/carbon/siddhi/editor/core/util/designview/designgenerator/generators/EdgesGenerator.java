@@ -114,6 +114,12 @@ public class EdgesGenerator {
     private Set<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
+            if (sink.isCorrelateIdExist()) {
+                SiddhiElementConfig sourceElement = getElementWithSinkCorrelateId(sink.getCorrelateId());
+                if (sourceElement != null) {
+                    edges.add(generateEdge(sink,sourceElement));
+                }
+            }
             edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName(), null), sink));
         }
         return edges;
@@ -133,18 +139,18 @@ public class EdgesGenerator {
             String inputStreamName = ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom();
             if (query.getPartitionId() != null && query.getConnectorsAndStreams() != null &&
                     query.getConnectorsAndStreams().values().contains(
-                        ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom())) {
-                    // Query connects through a PartitionConnector
-                    // Edge from Outer Element to PartitionConnector
-                    edges.add(
-                            generateEdgeToPartitionConnector(
-                                    getElementWithStreamName(inputStreamName, query.getPartitionId()),
-                                    query.getConnectorIdByStreamName(inputStreamName)));
-                    // Edge from PartitionConnector to Query
-                    edges.add(
-                            generateEdgeFromPartitionConnector(
-                                    query.getConnectorIdByStreamName(inputStreamName),
-                                    query));
+                            ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom())) {
+                // Query connects through a PartitionConnector
+                // Edge from Outer Element to PartitionConnector
+                edges.add(
+                        generateEdgeToPartitionConnector(
+                                getElementWithStreamName(inputStreamName, query.getPartitionId()),
+                                query.getConnectorIdByStreamName(inputStreamName)));
+                // Edge from PartitionConnector to Query
+                edges.add(
+                        generateEdgeFromPartitionConnector(
+                                query.getConnectorIdByStreamName(inputStreamName),
+                                query));
             } else {
                 // Query doesn't connect through a PartitionConnector
                 edges.add(
@@ -277,7 +283,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException        Error while generating Edges
      */
     private Set<Edge> generateAggregationEdges(List<AggregationConfig> aggregationConfigList)
-        throws DesignGenerationException {
+            throws DesignGenerationException {
         Set<Edge> edges = new HashSet<>();
         for (AggregationConfig aggregation : aggregationConfigList) {
             edges.add(
@@ -532,5 +538,14 @@ public class EdgesGenerator {
      */
     private static String generateEdgeId(String parentID, String childID) {
         return String.format("%s_%s", parentID, childID);
+    }
+
+    private SiddhiElementConfig getElementWithSinkCorrelateId(String correlateId) {
+        for (SourceSinkConfig sourceConfig : siddhiAppConfig.getSourceList()) {
+            if (sourceConfig.getCorrelateId().equals(correlateId)) {
+                return sourceConfig;
+            }
+        }
+        return null;
     }
 }
