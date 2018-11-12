@@ -1059,7 +1059,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
 
-                var textNode = $('#' + i).find('.tableNameNode');
+                var textNode = $('#' + id).find('.tableNameNode');
                 textNode.html(tableName);
 
                 // close the form window
