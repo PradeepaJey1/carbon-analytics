@@ -542,8 +542,10 @@ public class EdgesGenerator {
 
     private SiddhiElementConfig getElementWithSinkCorrelateId(String correlateId) {
         for (SourceSinkConfig sourceConfig : siddhiAppConfig.getSourceList()) {
-            if (sourceConfig.getCorrelateId().equals(correlateId)) {
-                return sourceConfig;
+            if (sourceConfig.getCorrelateId() != null) {
+                if (sourceConfig.getCorrelateId().equals(correlateId)) {
+                    return sourceConfig;
+                }
             }
         }
         return null;
