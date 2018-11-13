@@ -479,7 +479,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        SourceForm.prototype.generateDefineForm = function (i, formConsole, formContainer, top, left) {
+        SourceForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
 
             // create an empty source object and add it to the source array
@@ -492,8 +492,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var source = new SourceOrSinkAnnotation(sourceOptions);
 
             self.configurationData.getSiddhiAppConfig().addSource(source);
-            self.dropElement.generateSourceConnectionElements(self.newAgent,
-				editor.getValue().annotationType.name, i, top, left);
+            //            self.dropElement.generateSourceConnectionElements(self.newAgent,
+            //                                editor.getValue().annotationType.name, i, top, left);
             // perform JSON validation
             if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)) {
                 DesignViewUtils.prototype.errorAlert("To edit source configuration, please connect to a stream");
