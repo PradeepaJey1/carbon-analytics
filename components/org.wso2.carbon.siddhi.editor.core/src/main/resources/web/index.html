@@ -1005,36 +1005,38 @@
     </div>
 </div>
 
-<script id="attribute-form-template" type="text/x-handlebars-template">
-    <h3>Attributes</h3>
+<script id = "attribute-form-template" type = "text/x-handlebars-template">
+    <h4>Attributes</h4>
     <ul>
-        <div id="attribute-div">
+        <div id = "attribute-div">
             {{#each this}}
-            <li class="attribute">
-                <div class="attr-content">
-                    <input type="text" value="{{name}}" class="attr-name"/> &nbsp;
-                    <select class="attr-type">
-                        <option value="string">string</option>
-                        <option value="int">int</option>
-                        <option value="long">long</option>
-                        <option value="float">float</option>
-                        <option value="double">double</option>
-                        <option value="bool">bool</option>
-                        <option value="object">object</option>
-                    </select>
+            <li class = "attribute clearfix">
+                <div class = "clearfix">
+                    <div class = "attr-content">
+                        <input type = "text" value = "{{name}}" class = "attr-name"/>
+                        <select class = "attr-type">
+                            <option value = "string"> string </option>
+                            <option value = "int"> int </option>
+                            <option value = "long"> long </option>
+                            <option value = "float"> float </option>
+                            <option value = "double"> double </option>
+                            <option value = "bool"> bool </option>
+                            <option value = "object"> object </option>
+                        </select>
+                    </div>
+                    <div class = "attr-nav"></div>
                 </div>
-                <div class="attr-nav"></div>
+                <label class = "error-message"></label>
             </li>
             {{/each}}
         </div>
     </ul>
-    <br>
-    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
 </script>
 
-<script id="annotation-form-template" type="text/x-handlebars-template">
-    <h3>Annotations</h3>
-    <div id="annotation-div">
+<script id = "annotation-form-template" type = "text/x-handlebars-template">
+    <h4>Annotations</h4>
+    <div id = "annotation-div">
         {{#if this}}
         <ul>
             {{#each this}}
@@ -1044,31 +1046,31 @@
         {{/if}}
     </div>
     <br>
-    <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
-    <button id="btn-add-key-val" class="btn btn-default" style="display: none"> + Property</button>
-    <button id="btn-del-annotation" class="btn btn-default" style="display: none"> Delete</button>
-    <br>
+    <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
+    <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
+    <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
 </script>
 
-<script id="recursiveAnnotationPartial" type="text/template">
+<script id = "recursiveAnnotationPartial" type = "text/template">
     {{#if predefined}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
+                            {{value}}
                         </li>
                     </ul>
                 </li>
                 {{/each}}
     {{else}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
                             {{value}}
                         </li>
                     </ul>
@@ -1085,15 +1087,17 @@
         </li>
 </script>
 
-<script id="source-sink-form-template" type="text/template">
+<script id="source-sink-map-store-form-template" type="text/template">
     {{#ifSourceOrSink id}}
-        <h3>{{addTitle id}}</h3>
+        <h3>{{addTitle id}} Configuration</h3>
         <label class="clearfix"> * Type </label>
         <select id="{{id}}-type">
-            <option style="display:none" value ="none" disabled selected value > -- select a type -- </option>
+            <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
-              <h3>Source Mapping</h3>
-              <label class="clearfix"> Map Type </label>
+             {{#ifId id "map"}}
+                <h3> Mapping </h3>
+             {{/ifId}}
+              <label class="clearfix"> {{addTitle id}} Type </label>
               <select id="{{id}}-type">
     {{/ifSourceOrSink}}
 
@@ -1103,13 +1107,13 @@
     </select>
 </script>
 
-<script id = "source-sink-options-template" type = "text/template">
+<script id = "source-sink-store-options-template" type = "text/template">
     {{#if options}}
         <h3> Options </h3>
         <div id = "{{id}}-options">
-            {{#ifSourceOrSink id}}
+            {{#ifSourceOrSinkOrStore id}}
                 <div class = "sub-{{id}}-options-div">
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
             {{#each options}}
                 <div class = "option">
                 {{#if optional}}
@@ -1155,16 +1159,16 @@
                     <label class = "error-message"></label>
                 {{/if}}
                 </div>
-            {{#ifSourceOrSink ../id}}
+            {{#ifSourceOrSinkOrStore ../id}}
                 {{#if (isDivisor (sum @index 1) ../options)}}
                     </div>
                     <div class = "sub-{{../id}}-options-div">
                 {{/if}}
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
             {{/each}}
-            {{#ifSourceOrSink id}}
+            {{#ifSourceOrSinkOrStore id}}
                 </div>
-            {{/ifSourceOrSink}}
+            {{/ifSourceOrSinkOrStore}}
     {{/if}}
     </div>
     <div class = "customized-options" id = "customized-{{id}}-options">
@@ -1192,13 +1196,13 @@
 <script id = "source-sink-map-attribute-template" type = "text/template">
     <div id = "mapper-attributes">
         <div class = "attribute-labels clearfix">
-                <label id = "attribute-key-label"> Key </label>
+                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
                 <label id = "attribute-value-label"> Value </label>
         </div>
         {{#each this}}
         <div class = "attribute">
                 <div class = "clearfix">
-                <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
+                {{#if key }} <input type = "text" value = "{{key}}" class = "attr-key" readonly/> {{/if}}
                 <input type = "text" value = "{{value}}" class = "attr-value"/>
                 </div>
                 <label class = "error-message"></label>
