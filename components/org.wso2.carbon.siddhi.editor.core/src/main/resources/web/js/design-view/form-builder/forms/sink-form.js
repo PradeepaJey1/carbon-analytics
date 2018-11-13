@@ -39,6 +39,392 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 this.dropElement = options.dropElement;
                 this.newAgent = options.newAgent;
             }
+        };
+
+        /** Generates the current index of the option being rendered */
+        Handlebars.registerHelper('sum', function () {
+            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
+        });
+
+        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
+        Handlebars.registerHelper('isDivisor', function (index, options) {
+            var divLength = Math.ceil(options.length / 2);
+            return index === divLength;
+        });
+
+        /** Handlebar helper to render heading for the form */
+        Handlebars.registerHelper('addTitle', function (id) {
+            return id.charAt(0).toUpperCase() + id.slice(1);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" */
+        Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
+            if (id === "source" || id === "sink") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
+            if (id === "source" || id === "sink" || id === "store") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to check id is equivalent to a given string */
+        Handlebars.registerHelper('ifId', function (id, name, div) {
+            if (id === name) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /**
+         * Function to get the options of the selected sink/map type
+         * @param {String} selectedType Selected sink/map type
+         * @param {object} types Predefined sink/map types
+         * @return {object} options
+         */
+        var getSelectedTypeOptions = function (selectedType, types) {
+            var options = [];
+            for (type of types) {
+                if (type.name.toLowerCase() == selectedType.toLowerCase()) {
+                    options = type.parameters;
+                    break;
+                }
+            }
+            return options;
+        };
+
+        /**
+         * Function to render the options for the selected map/sink type using handlebars
+         * @param {Object} optionsArray Saved options
+         * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
+         * @param {String} id Id for the div to embed the options
+         */
+        var renderOptions = function (optionsArray, customizedOptions, id) {
+            optionsArray.sort(function (val1, val2) {
+                if (val1.optional && !val2.optional) return 1;
+                else if (!val1.optional && val2.optional) return -1;
+                else return 0;
+            });
+            var sourceOptionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html());
+            var wrappedHtml = sourceOptionsTemplate({
+                id: id,
+                options: optionsArray,
+                customizedOptions: customizedOptions
+            });
+            $('#' + id + '-options-div').html(wrappedHtml);
+            changeCustOptDiv();
+        };
+
+        /**
+         * Function to render the select options for the map type using handlebars
+         * @param {Object} predefined_source_maps Predefined map annotations
+         */
+        var renderMap = function (predefined_source_maps) {
+            if (!$.trim($('#define-map').html()).length) {
+                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var wrappedHtml = mapFormTemplate({ id: "map", types: predefined_source_maps });
+                $('#define-map').html(wrappedHtml);
+                $('#define-map #map-type').val('passThrough');
+                $('#define-map #map-type option:contains("passThrough")').text('passThrough (default)');
+            }
+        };
+
+        /**
+         * Function to map the saved option values to the option object
+         * @param {Object} predefinedOptions Predefined options of a particular sink/map annotation type
+         * @param {Object} savedOptions Saved options
+         * @return {Object} options
+        */
+        var mapUserOptionValues = function (predefinedOptions, savedOptions) {
+            var options = [];
+            _.forEach(predefinedOptions, function (predefinedOption) {
+                var foundPredefinedOption = false;
+                for (var savedOption of savedOptions) {
+                    var optionKey = savedOption.split('=')[0].trim();
+                    var optionValue = savedOption.split('=')[1].trim();
+                    optionValue = optionValue.substring(1, optionValue.length - 1);
+                    if (optionKey.toLowerCase() == predefinedOption.name.toLowerCase()) {
+                        foundPredefinedOption = true;
+                        options.push({
+                            key: predefinedOption.name, value: optionValue, description: predefinedOption
+                                .description, optional: predefinedOption.optional,
+                            defaultValue: predefinedOption.defaultValue
+                        });
+                        break;
+                    }
+                }
+                if (!foundPredefinedOption) {
+                    options.push({
+                        key: predefinedOption.name, value: "", description: predefinedOption
+                            .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
+                    });
+                }
+            });
+            return options;
+        };
+
+        /**
+         * Function to render the html to display the select options for attribute mapping
+         */
+        var renderAttributeMapping = function () {
+            if (!$.trim($('#define-attribute').html()).length) {
+                var attributeDiv = $('<div class="clearfix"> <label id="attribute-map-label">' +
+                    '<input type="checkbox" id="attributeMap-checkBox"> Payload or Attribute Mapping' +
+                    '</label> </div> <div class = "clearfix"> <select id = "attributeMap-type" disabled>' +
+                    '<option value = "attributeMap"> Enter attributes as key/value pairs </option>' +
+                    '<option value = "payloadMap"> Enter payload as key/value pairs </option>' +
+                    '<option value = "payloadList"> Enter a single payload attribute </option>' +
+                    '</select></div>');
+                $('#define-attribute').html(attributeDiv);
+            }
+        };
+
+        /**
+         * Function to obtain the customized option entered by the user in the source view
+         * @param {Object} predefinedOptions Predefined options of a particular sink/map annotation type
+         * @param {Object} savedOptions Options defined by the user in the source view
+         * @return {Object} customizedOptions
+         */
+        var getCustomizedOptions = function (predefinedOptions, savedOptions) {
+            var customizedOptions = [];
+            _.forEach(savedOptions, function (savedOption) {
+                var foundSavedOption = false;
+                for (var predefinedOption of predefinedOptions) {
+                    var optionKey = savedOption.split('=')[0];
+                    var optionValue = savedOption.split('=')[1].trim();
+                    optionValue = optionValue.substring(1, optionValue.length - 1);
+                    if (predefinedOption.name.toLowerCase() == optionKey.toLowerCase().trim()) {
+                        foundSavedOption = true;
+                        break;
+                    }
+                }
+                if (!foundSavedOption) {
+                    customizedOptions.push({ key: optionKey, value: optionValue });
+                }
+            });
+            return customizedOptions;
+        };
+
+        /**
+        * Function to sort alphabetically an array of objects by some specific key.
+        * @param {String} property Key of the object to sort.
+        */
+        var sortUsingProperty = function (property) {
+            var sortOrder = 1;
+            if (property[0] === "-") {
+                sortOrder = -1;
+                property = property.substr(1);
+            }
+            return function (a, b) {
+                if (sortOrder == -1) {
+                    return b[property].localeCompare(a[property]);
+                } else {
+                    return a[property].localeCompare(b[property]);
+                }
+            }
+        };
+
+        /**
+         * Function to create option object with an additional empty value attribute
+         * @param {Object} optionArray Predefined options without the attribute 'value'
+         * @return {Object} options
+         */
+        var createOptionObjectWithValues = function (optionArray) {
+            var options = [];
+            _.forEach(optionArray, function (option) {
+                options.push({
+                    key: option.name, value: "", description: option.description, optional: option.optional,
+                    defaultValue: option.defaultValue
+                });
+            });
+            return options;
+        };
+
+        /**
+         * Function to create attribute-map object with the saved attribute-map
+         * @param {Object} savedMapperAttributes Saved attribute-map
+         * @param {Object} streamAttributes Attributes of the connected stream
+         * @return {Object} attributes
+         */
+        var createAttributeObjectList = function (savedMapperAttributes, streamAttributes) {
+            var attributeType = savedMapperAttributes.getType().toLowerCase();
+            var annotationType = savedMapperAttributes.getAnnotationType().toLowerCase();
+            var attributeValues = savedMapperAttributes.getValue();
+            var attributes = [];
+            if ((annotationType === "attributes" && attributeType === "map") || (annotationType === "payload" &&
+                attributeType === "map")) {
+                if (annotationType === "attributes") {
+                    $('#define-attribute #attributeMap-type').val('attributeMap');
+                } else {
+                    $('#define-attribute #attributeMap-type').val('payloadMap');
+                }
+                for (var streamAttribute of streamAttributes) {
+                    for (var attribute in attributeValues) {
+                        if (streamAttribute.key === attribute) {
+                            attributes.push({ key: attribute, value: attributeValues[attribute] });
+                            break;
+                        }
+                    }
+                }
+            } else if (annotationType === "attributes" && attributeType === "list") {
+                $('#define-attribute #attributeMap-type').val('attributeMap');
+                var i = 0;
+                for (var attribute in attributeValues) {
+                    attributes.push({ key: streamAttributes[i].key, value: attributeValues[attribute] });
+                    i++;
+                }
+            } else if (annotationType === "payload" && attributeType === "list") {
+                $('#define-attribute #attributeMap-type').val('payloadList');
+                attributes.push({ value: attributeValues[0] });
+            }
+            return attributes;
+        };
+
+        /**
+         * Function to create attribute-map objects with empty values
+         * @param {Object} streamAttributes Attributes if the connected stream
+         * @return {Object} attributes
+         */
+        var initialiseAttributeContent = function (streamAttributes) {
+            var selectedAttributeType = $('#define-attribute #attributeMap-type').val();
+            var attributes = [];
+            if (selectedAttributeType === 'attributeMap' || selectedAttributeType === 'payloadMap') {
+                for (var streamAttribute of streamAttributes) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                }
+            } else {
+                attributes.push({ value: "" });
+            }
+            return attributes;
+        };
+
+        /**
+         * Function to render the attribute-map div using handlebars
+         * @param {Object} attributes which needs to be mapped on to the template
+         */
+        var renderAttributeMappingContent = function (attributes) {
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
+            var wrappedHtml = attributeMapFormTemplate(attributes);
+            $('#attribute-map-content').html(wrappedHtml);
+        }
+
+        /**
+         * Function to obtain the connected stream's attributes
+         * @param {Object} streamList List of all stream objects
+         * @param {String} connectedElement source's connected element's name
+         * @return {Object} streamAttributes
+         */
+        var getConnectStreamAttributes = function (streamList, connectedElement) {
+            var streamAttributes = [];
+            for (var stream of streamList) {
+                if (stream.name == connectedElement) {
+                    var attributeList = stream.getAttributeList();
+                    _.forEach(attributeList, function (attribute) {
+                        streamAttributes.push({ key: attribute.getName(), value: "" });
+                    })
+                    break;
+                }
+            }
+            return streamAttributes;
+        };
+
+        /**
+         * Function to validate the customized options
+         * @param {Object} selectedOptions options which needs to be saved
+         * @param {String} id to identify the div in the html to traverse
+         * @return {boolean} isError
+         */
+        var validateCustomizedOptions = function (selectedOptions, id) {
+            var isError = false;
+            var option = "";
+            if ($('#customized-' + id + ' ul').has('li').length != 0) {
+                $('#customized-' + id + ' .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") || (custOptValue != "")) {
+                        if (custOptName == "") {
+                            $(this).find('.error-message').text('Option key is not filled.');
+                            $(this)[0].scrollIntoView();
+                            $(this).find('.cust-option-key').addClass('required-input-field');
+                            isError = true;
+                            return false;
+                        } else if (custOptValue == "") {
+                            $(this).find('.error-message').text('Option value is not filled.');
+                            $(this)[0].scrollIntoView();
+                            $(this).find('.cust-option-value').addClass('required-input-field');
+                            isError = true;
+                            return false;
+                        } else {
+                            option = custOptName + " = '" + custOptValue + "'";
+                            selectedOptions.push(option);
+                        }
+                    }
+                });
+            }
+            return isError;
+        };
+
+        /**
+         * Function to obtain a particular option from predefined option
+         * @param {String} optionName option which needs to be found
+         * @param {Object} predefinedOptions set of predefined option
+         * @return {Object} option
+         */
+        var getOption = function (optionName, predefinedOptions) {
+            var option = null;
+            for (var predefinedOption of predefinedOptions) {
+                if (predefinedOption.name.toLowerCase() == optionName.toLowerCase()) {
+                    option = predefinedOption;
+                    break;
+                }
+            }
+            return option;
+        };
+
+        /**
+        * Function to validate the data type of the options
+        * @param {String} dataType data-type of the option
+        * @param {String} optionValue value of the option
+        * @return {boolean} invalidDataType
+        */
+        var validateDataType = function (dataType, optionValue) {
+            var invalidDataType = false;
+            intLongRegexMatch = /^[-+]?\d+$/;
+            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+
+            if (dataType === "INT" || dataType === "LONG") {
+                if (!optionValue.match(intLongRegexMatch)) {
+                    invalidDataType = true;
+                }
+            } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
+                if (!optionValue.match(doubleFloatRegexMatch)) {
+                    invalidDataType = true;
+                }
+            } else if (dataType === "BOOL") {
+                if (!(optionValue.toLowerCase() === "false" || optionValue.toLowerCase() === "true")) {
+                    invalidDataType = true;
+                }
+            }
+            return invalidDataType;
+        };
+
+        /** Function to change the heading and the button text of the customized options div */
+        var changeCustOptDiv = function () {
+            var sourceCustOptionList = $('.source-sink-map-options #customized-sink-options').
+                find('.cust-options li');
+            if (sourceCustOptionList.length > 0) {
+                $('.source-sink-map-options #customized-sink-options').find('h3').show();
+                $('.source-sink-map-options #customized-sink-options').find('.btn-add-options').html('Add more');
+            } else {
+                $('.source-sink-map-options #customized-sink-options').find('h3').hide();
+                $('.source-sink-map-options #customized-sink-options').find('.btn-add-options').
+                    html('Add customized option');
+            }
             var mapperCustOptionList = $('.source-sink-map-options #customized-mapper-options').
                 find('.cust-options li');
             if (mapperCustOptionList.length > 0) {
@@ -116,7 +502,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        SinkForm.prototype.generateDefineForm = function (i, formConsole, formContainer, top, left) {
+        SinkForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
 
             // create an empty sink object and add it to the sink array
@@ -129,8 +515,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var sink = new SourceOrSinkAnnotation(sinkOptions);
 
             self.configurationData.getSiddhiAppConfig().addSink(sink);
-            self.dropElement.generateSinkConnectionElements(self.newAgent,
-					editor.getValue().annotationType.name, i, top, left);
+            //            self.dropElement.generateSinkConnectionElements(self.newAgent,
+            //					editor.getValue().annotationType.name, i, top, left);
             // perform JSON validation
             if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(sink, 'Sink', true)) {
                 DesignViewUtils.prototype.errorAlert("To edit sink configuration, please connect to a stream");
@@ -538,3 +924,4 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
         return SinkForm;
     });
+
